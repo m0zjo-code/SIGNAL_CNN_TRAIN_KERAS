@@ -1,3 +1,4 @@
+Opt,CNN_Layers,Dense_Layers,Arch,Loss,Acc
 SGD,0,3,0_3,1.504688,29.6522
 Adam,0,1,0_1,0.298756,90.0870
 SGD,6,3,6_3,1.587135,29.6522
