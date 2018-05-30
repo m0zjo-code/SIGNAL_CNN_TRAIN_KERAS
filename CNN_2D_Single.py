@@ -24,6 +24,7 @@ import os, time
 
 parser = argparse.ArgumentParser(description='Train a CNN')
 parser.add_argument('--input', help='Location of Training Archive', action="store", dest="input_file")
+parser.add_argument('--prefix', help='Prefix of Output Files', action="store", dest="network_prefix")
 args = parser.parse_args()
 
 if args.input_file == None:
@@ -48,8 +49,8 @@ if not USE_GPU:
 
 def train_network(optimiser = 'rmsprop', no_conv_layers = 5, no_hidden_layers = 4):
     
-    filename_prefix = "_%s_%i_%i_%s"%(optimiser, no_conv_layers, no_hidden_layers, str(int(time.time())))
-    batch_size = 4 # in each iteration, we consider 32 training examples at once
+    filename_prefix = "%s_%s_%i_%i_%s"%(args.network_prefix, optimiser, no_conv_layers, no_hidden_layers, str(int(time.time())))
+    batch_size = 8 # in each iteration, we consider 32 training examples at once
     num_epochs = 2000 # we iterate 2000 times over the entire training set
     kernel_size = 3 # we will use 3x3 kernels throughout
     pool_size = 2 # we will use 2x2 pooling throughout
@@ -153,7 +154,7 @@ def train_network(optimiser = 'rmsprop', no_conv_layers = 5, no_hidden_layers = 
 
 
     earlystop = keras.callbacks.EarlyStopping(monitor='val_acc', min_delta=0.001, patience=earlystop_p, verbose=1, mode='auto')
-    csv_logger = CSVLogger('training%s.log'%filename_prefix)
+    csv_logger = CSVLogger('training_%s.log'%filename_prefix)
     callbacks_list = [earlystop, csv_logger]
 
 
@@ -182,10 +183,10 @@ def train_network(optimiser = 'rmsprop', no_conv_layers = 5, no_hidden_layers = 
     if SAVE_MODEL:
         # serialize model to JSON
         model_json = model_final.to_json()
-        with open("specmodel%s.nn"%filename_prefix, "w") as json_file:
+        with open("%s.nn"%filename_prefix, "w") as json_file:
             json_file.write(model_json)
         # serialize weights to HDF5
-        model_final.save_weights("specmodel%s.h5"%filename_prefix)
+        model_final.save_weights("%s.h5"%filename_prefix)
         print("Saved model to disk")
 
     Y_predict = model_final.predict(X_test)
@@ -194,7 +195,7 @@ def train_network(optimiser = 'rmsprop', no_conv_layers = 5, no_hidden_layers = 
     
     print(model_final.metrics_names)
     print(scores)
-    with open('results%s.log'%filename_prefix, "a") as f:
+    with open('%s.log'%filename_prefix, "a") as f:
         f.write("loss, acc\n")
         f.write("%f, %.4f%%" % (scores[0], scores[1]*100))
         f.write('\n')
