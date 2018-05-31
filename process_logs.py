@@ -6,7 +6,7 @@ res = [k for k in ls if 'results' in k]
 
 with open('ProcessedLogs.csv', 'w', newline='') as csvfile:
     spamwriter = csv.writer(csvfile, delimiter=',',quotechar='|', quoting=csv.QUOTE_MINIMAL)
-
+    spamwriter.writerow(["Opt", "CNN_Layers", "Dense_Layers", "Arch", "Loss", "Acc"])
     for i in res:
         F = open(in_dir+i,'r')
         name = i.split("_")
