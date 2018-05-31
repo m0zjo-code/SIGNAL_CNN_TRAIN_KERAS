@@ -21,6 +21,8 @@ from sklearn.metrics import confusion_matrix
 
 import os, time
 
+## Disable TF warnings - these can be shown with this script due to the large amount of memory in use
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
 parser = argparse.ArgumentParser(description='Train a CNN')
 parser.add_argument('--input', help='Location of Training Archive', action="store", dest="input_file")
@@ -36,7 +38,7 @@ USE_GPU = False
 
 USE_PRE_TRAINED_NETWORK = False
 
-SAVE_MODEL = False
+SAVE_MODEL = True
 
 def norm_data(X):
     return (X-np.min(X))/(np.max(X)-np.min(X))
