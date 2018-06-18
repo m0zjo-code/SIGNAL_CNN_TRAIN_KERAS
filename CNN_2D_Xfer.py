@@ -5,7 +5,7 @@ import keras
 from keras import backend as kr
 from keras.datasets import cifar10 # subroutines for fetching the CIFAR-10 dataset
 from keras.models import Model # basic class for specifying and training a neural network
-from keras.layers import Input, Convolution1D, Convolution2D, MaxPooling1D, MaxPooling2D, Dense, Dropout, Flatten
+from keras.layers import Input, Convolution1D, Convolution2D, MaxPooling1D, MaxPooling2D, Dense, Dropout, Flatten, GlobalAveragePooling2D
 from keras.utils import np_utils # utilities for one-hot encoding of ground truth values
 
 from keras.optimizers import *
@@ -36,7 +36,7 @@ if args.input_file == None:
 
 USE_GPU = False
 
-USE_PRE_TRAINED_NETWORK = False
+USE_PRE_TRAINED_NETWORK = True
 
 SAVE_MODEL = True
 
@@ -128,14 +128,18 @@ def train_network(optimiser = 'rmsprop', no_conv_layers = 5, no_hidden_layers = 
 
     elif USE_PRE_TRAINED_NETWORK:
         from keras import applications
-
-        #print(X_test.shape)
         
-        input_tensor = Input(shape=(height, width, depth))
+        X_train = np.repeat(X_train, repeats=3, axis=-1)
+        X_test = np.repeat(X_test, repeats=3, axis=-1)
+        print(X_test.shape)
         
-        base_model = applications.xception.Xception(input_tensor=input_tensor, include_top=False, weights='imagenet', classes=num_classes)
+        
+        
+        input_tensor = Input(shape=(height, width, 3))
+        
+        #base_model = applications.xception.Xception(input_tensor=input_tensor, include_top=False, weights='imagenet', classes=num_classes)
 
-        #model = applications.mobilenet.MobileNet(include_top=False, weights='imagenet', input_shape = (height, width, 3), classes=num_classes)
+        base_model = applications.vgg16.VGG16(input_tensor=input_tensor, include_top=False, weights='imagenet', classes=num_classes)
         
         # add a global spatial average pooling layer
         x = base_model.output
